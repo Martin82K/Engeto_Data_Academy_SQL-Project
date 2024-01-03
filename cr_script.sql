@@ -21,12 +21,20 @@
  5. Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, pokud HDP vzroste výrazněji v jednom roce,
  6. projeví se to na cenách potravin či mzdách ve stejném nebo násdujícím roce výraznějším růstem?
  */
-SELECT * FROM czechia_payroll WHERE value_type_code = 5958;
+
+SELECT *
+FROM czechia_payroll
+WHERE
+    value_type_code = 5958 -- průměrná hrubá mzda
+;
+
+-- výběr země z tabulky country
+SELECT * FROM countries c WHERE country = 'Czech Republic';
 
 SELECT
     payroll_year,
     industry_branch_code,
-    AVG(value)
+    ROUND(AVG(value), 2)
 FROM czechia_payroll cp
 WHERE
     value_type_code = 5958
@@ -34,9 +42,36 @@ WHERE
 GROUP BY payroll_year;
 
 SELECT * FROM czechia_payroll_industry_branch cpib;
+-- vytvoření tabulky projektu pro ČR
+CREATE TABLE
+    IF NOT EXISTS t_martin_kalkus_project_SQL_primary_final();
 
-SELECT * FROM czechia_payroll_unit;
+-- mzdy pro ČR
+SELECT *
+FROM czechia_payroll cp
+    INNER JOIN czechia_payroll_industry_branch cpib ON cp.industry_branch_code = cpib.code
+    CROSS JOIN countries c
+WHERE
+    value_type_code = 5958
+    AND country = 'Czech Republic';
+
+-- potraviny
+SELECT *
+FROM czechia_price cp
+    INNER JOIN czechia_price_category cpc ON cp.category_code = cpc.code
+    INNER JOIN czechia_region cr ON cp.region_code = cr.code;
+-- kombinace mzdy a potravin
+SELECT *
+FROM czechia_payroll cp
+    INNER JOIN czechia_payroll_industry_branch cpib ON cp.industry_branch_code = cpib.code
+    CROSS JOIN countries c
+WHERE
+    value_type_code = 5958
+    AND country = 'Czech Republic'
+
+UNION ALL
 
 SELECT *
-FROM
-    czechia_payroll_value_type -- (5,958) průměrná hrubá mzda, (316) Průměrný počet zaměstnaných osob
+FROM czechia_price cp
+    INNER JOIN czechia_price_category cpc ON cp.category_code = cpc.code
+    INNER JOIN czechia_region cr ON cp.region_code = cr.code;
