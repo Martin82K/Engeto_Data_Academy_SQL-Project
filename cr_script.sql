@@ -22,7 +22,6 @@
  6. projeví se to na cenách potravin či mzdách ve stejném nebo násdujícím roce výraznějším růstem?
  */
 
-SELECT *
 FROM czechia_payroll
 WHERE
     value_type_code = 5958 -- průměrná hrubá mzda
@@ -44,7 +43,23 @@ GROUP BY payroll_year;
 SELECT * FROM czechia_payroll_industry_branch cpib;
 -- vytvoření tabulky projektu pro ČR
 CREATE TABLE
-    IF NOT EXISTS t_martin_kalkus_project_SQL_primary_final();
+    t_martin_kalkus_project_SQL_primary_final AS
+SELECT *
+FROM czechia_payroll cp
+    INNER JOIN czechia_payroll_industry_branch cpib ON cp.industry_branch_code = cpib.code
+    CROSS JOIN countries c
+WHERE
+    value_type_code = 5958
+    AND country = 'Czech Republic'
+UNION ALL
+
+SELECT *
+FROM czechia_price cp
+    INNER JOIN czechia_price_category cpc ON cp.category_code = cpc.code
+    INNER JOIN czechia_region cr ON cp.region_code = cr.code;
+
+-- drop tabulky
+DROP TABLE t_martin_kalkus_project_SQL_primary_final;
 
 -- mzdy pro ČR
 SELECT *
