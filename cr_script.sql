@@ -22,71 +22,62 @@
  6. projeví se to na cenách potravin či mzdách ve stejném nebo násdujícím roce výraznějším růstem?
  */
 
-FROM czechia_payroll
-WHERE
-    value_type_code = 5958 -- průměrná hrubá mzda
-;
+/*
+ * Příprava tabulky dat.
+ * Vzhledem k tomu, že spojované tabulky obsahují data pro ČR, nebylo nutné připojovat další tabulku s údaji o zemi.
+ * Vytvoříme tabulku s názvem t_martin_kalkus_project_SQL_primary_final.
+ * Výsledná tabulka obsahuje data z tabulek czechia_payroll a czechia_payroll_industry_branch, obsahující data o mzdách.
+ * Dále připojíme data z tabulek czechia_price, czechia_price_category a czechia_region, obsahující data o potravinách.
+ * Výsledná tabulka obsahuje data pro ČR, která jsou potřebná pro zodpovězení výzkumných otázek.
+ */
 
--- výběr země z tabulky country
-SELECT * FROM countries c WHERE country = 'Czech Republic';
-
-SELECT
-    payroll_year,
-    industry_branch_code,
-    ROUND(AVG(value), 2)
-FROM czechia_payroll cp
-WHERE
-    value_type_code = 5958
-    AND industry_branch_code = 'B'
-GROUP BY payroll_year;
-
-SELECT * FROM czechia_payroll_industry_branch cpib;
 -- vytvoření tabulky projektu pro ČR
 CREATE TABLE
     t_martin_kalkus_project_SQL_primary_final AS
 SELECT *
 FROM czechia_payroll cp
     INNER JOIN czechia_payroll_industry_branch cpib ON cp.industry_branch_code = cpib.code
-    CROSS JOIN countries c
-WHERE
-    value_type_code = 5958
-    AND country = 'Czech Republic'
+WHERE value_type_code = 5958
 UNION ALL
-
+-- připojení dat pro potraviny
 SELECT *
 FROM czechia_price cp
     INNER JOIN czechia_price_category cpc ON cp.category_code = cpc.code
     INNER JOIN czechia_region cr ON cp.region_code = cr.code;
 
--- drop tabulky
-DROP TABLE t_martin_kalkus_project_SQL_primary_final;
+/*
+ * Výzkumná otázka: 1. Rostou v průběhu let mzdy ve všech odvětvích, nebo v některých klesají?
+ *
+ * Z tabhulky t_martin_kalkus_project_SQL_primary_final vybereme názvy odvětví a roky, za které máme data. 
+ * Následně vytvoříme tabulku (CTE) s názvem prumerny_plat, která obsahuje průměrné mzdy za jednotlivá odvětví a roky. 
+ * Aplikujeme funkci Lead, která nám umožní porovnat průměrné mzdy v jednotlivých letech. 
+ * Výsledná tabulka obsahuje mimo původní sloupce také status s vyznačením roku s posledním růstem mezd.
+ */
 
--- mzdy pro ČR
-SELECT *
-FROM czechia_payroll cp
-    INNER JOIN czechia_payroll_industry_branch cpib ON cp.industry_branch_code = cpib.code
-    CROSS JOIN countries c
-WHERE
-    value_type_code = 5958
-    AND country = 'Czech Republic';
+-- TEMP CTE a následná podmínka
+WITH prumerny_plat AS (
+        SELECT
+            name AS industry_category,
+            payroll_year AS year,
+            ROUND(AVG(value), 0) AS salary_avg
+        FROM
+            t_martin_kalkus_project_SQL_primary_final
+        GROUP BY
+            name,
+            payroll_year
+    )
+SELECT
+    pp.*,
+    CASE
+        WHEN pp.salary_avg > LEAD(pp.salary_avg) OVER (
+            PARTITION BY pp.industry_category
+            ORDER BY
+                pp.year
+        ) THEN 'Konec růstu'
+        ELSE ''
+    END AS status
+FROM prumerny_plat pp;
 
--- potraviny
-SELECT *
-FROM czechia_price cp
-    INNER JOIN czechia_price_category cpc ON cp.category_code = cpc.code
-    INNER JOIN czechia_region cr ON cp.region_code = cr.code;
--- kombinace mzdy a potravin
-SELECT *
-FROM czechia_payroll cp
-    INNER JOIN czechia_payroll_industry_branch cpib ON cp.industry_branch_code = cpib.code
-    CROSS JOIN countries c
-WHERE
-    value_type_code = 5958
-    AND country = 'Czech Republic'
-
-UNION ALL
-
-SELECT *
-FROM czechia_price cp
-    INNER JOIN czechia_price_category cpc ON cp.category_code = cpc.code
-    INNER JOIN czechia_region cr ON cp.region_code = cr.code;
+/*
+ * VÝZKUMNÁ OTÁZKA: 2. Kolik je možné si koupit litrů mléka a kilogramů chleba za první a poslední srovnatelné období v dostupných datech cen a mezd?
+ */
