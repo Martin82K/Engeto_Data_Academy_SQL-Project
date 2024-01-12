@@ -16,6 +16,16 @@ As additional material, prepare a table with GDP, GINI coefficient, and the popu
 4. Is there a year in which the annual increase in food prices was significantly higher than wage growth (more than 10%)?
 5. Does the level of GDP affect changes in wages and food prices? In other words, if GDP increases significantly in one year, will this be reflected in food prices or wages in the same or following year with a more significant increase?
 
+### Data Preparation
+
+Nejdříve si vytvoříme dataset spojením dostupných dat z databáze Engeto. Tím zajístíme správnou funkčnost.
+Před spuštěním scriptů pro zodpovězení výzkumných otázek prosím nejdříve spusťte tyto scripty:
+
+```
+primary_dataset.sql
+secondary_dataset.sql
+```
+
 ### ANSWER Q1:
 
 ### ANSWER Q2:
