@@ -3,6 +3,7 @@
  */
 
 /*
+ Create primary dataset "t_martin_kalkus_project_SQL_primary_final"
  This selection query retrieves data from multiple tables to generate a report on payroll information.
  The query filters the data from the 'czechia_payroll' table based on the 'value_type_code' column.
  It then joins the filtered data with other tables to retrieve additional information such as industry, payroll, product details, price, quantity, and unit.
