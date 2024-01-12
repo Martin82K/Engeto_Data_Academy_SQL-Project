@@ -18,8 +18,7 @@ As additional material, prepare a table with GDP, GINI coefficient, and the popu
 
 ### Data Preparation
 
-Nejdříve si vytvoříme dataset spojením dostupných dat z databáze Engeto. Tím zajístíme správnou funkčnost.
-Před spuštěním scriptů pro zodpovězení výzkumných otázek prosím nejdříve spusťte tyto scripty:
+First, we will create a dataset by combining the available data from the Engeto database. This will ensure proper functionality. Before running the scripts to answer the research questions, please run these scripts first:
 
 ```
 primary_dataset.sql
@@ -27,6 +26,9 @@ secondary_dataset.sql
 ```
 
 ### ANSWER Q1:
+
+To obtain the answer, we always compared the values with the previous year. In the case of a decrease, a condition about reduced salary was taken into account, according to which only those records were obtained where and in which year the decrease actually occurred.
+![Q1 answer](images/A1_output_demo.png)
 
 ### ANSWER Q2:
 
