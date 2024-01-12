@@ -30,7 +30,7 @@ REPLACE
             price
     );
 
--- This code show a power to buy in year 2006 and 2018.
+-- This code show a power to buy in year 2006 and 2018. It means how many liters of milk and kilograms of bread can be bought.
 SELECT
     `date`,
     product,

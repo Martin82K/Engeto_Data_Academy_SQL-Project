@@ -1,10 +1,5 @@
 /*
- RESEARCH QUESTIONS:
- 1.Are wages increasing over the years in all sectors, or are they decreasing in some?
- 2.How many liters of milk and kilograms of bread can be bought for the first and last comparable period in the available data of prices and wages?
- 3.Which food category is getting more expensive the slowest (i.e., it has the lowest annual percentage increase)?
- 4.Is there a year in which the annual increase in food prices was significantly higher than wage growth (more than 10%)?
- 5.Does the level of GDP affect changes in wages and food prices? In other words, if GDP increases significantly in one year, will this be reflected in food prices or wages in the same or following year with a more significant increase?
+ Martin Kalkuš - discord: martink8047 
  */
 
 /*
